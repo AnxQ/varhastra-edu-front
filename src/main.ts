@@ -3,11 +3,12 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
+import snack from "./snack";
 import { createApolloProvider } from "./plugins/vue-apollo";
 import "@/main.scss";
 
 Vue.config.productionTip = false;
-
+Vue.prototype.snack = snack;
 new Vue({
   vuetify,
   router,

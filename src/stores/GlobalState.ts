@@ -1,11 +1,14 @@
 import { Module } from "vuex";
-import { DepartmentInfo, UserInfo } from "@/struct";
+import { DepartmentInfo, UserInfo, GroupChatMsgResult } from "@/struct";
+import { Observable } from 'apollo-boost';
+import { subscribe } from 'graphql';
 
 interface GlobalState {
   userId: string | null;
   role: string | null;
   departments: DepartmentInfo[] | null;
   userInfo: UserInfo[] | null;
+  subscribe: Observable<GroupChatMsgResult> | null
 }
 
 const GlobalStateStore: Module<GlobalState, {}> = {
@@ -14,7 +17,8 @@ const GlobalStateStore: Module<GlobalState, {}> = {
     userId: null,
     role: null,
     userInfo: null,
-    departments: null
+    departments: null,
+    subscribe: null
   },
   mutations: {
     setUserIdAndRole(state, { userId, role }) {
@@ -30,10 +34,10 @@ const GlobalStateStore: Module<GlobalState, {}> = {
       state.departments = departments;
     },
     setUserInfo(state, { userInfo }) {
-      state.userInfo = userInfo
+      state.userInfo = userInfo;
     },
     resetUserInfo(state) {
-      state.userInfo = null
+      state.userInfo = null;
     }
   },
   actions: {}

@@ -13,12 +13,13 @@
                   <template v-slot:activator="{ on }">
                     <v-avatar
                       class="hoverable"
-                      :color="loading ? 'grey' : 'blue'"
+                      :color="snack.loading ? 'grey' : 'blue'"
                       size="64"
                       v-on="on"
                     >
                       <user-avatar
                         class="white--text"
+                        :v-if="!snack.loading"
                         :url="userInfo.avatar"
                         :size="64"
                         :name="userInfo.name"
@@ -26,7 +27,7 @@
                       ></user-avatar>
                     </v-avatar>
                   </template>
-                  <span>avatar service based on Gravatar</span>
+                  <span>点击更换</span>
                 </v-tooltip>
                 <v-spacer></v-spacer>
               </v-row>
@@ -34,7 +35,7 @@
                 <v-row>
                   <v-col cols="6">
                     <v-text-field
-                      :loading="loading"
+                      :loading="snack.loading"
                       readonly
                       label="姓名"
                       :value="userInfo.name"
@@ -42,7 +43,7 @@
                   </v-col>
                   <v-col cols="6">
                     <v-text-field
-                      :loading="loading"
+                      :loading="snack.loading"
                       readonly
                       label="身份"
                       :value="role"
@@ -54,7 +55,7 @@
                 >
                   <v-col cols="6">
                     <v-text-field
-                      :loading="loading"
+                      :loading="snack.loading"
                       readonly
                       :value="userInfo.department.name"
                       label="学院"
@@ -62,7 +63,7 @@
                   </v-col>
                   <v-col cols="6">
                     <v-text-field
-                      :loading="loading"
+                      :loading="snack.loading"
                       readonly
                       :value="userInfo.major.name"
                       label="专业"
@@ -72,7 +73,7 @@
                 <v-row>
                   <v-col cols="6">
                     <v-text-field
-                      :loading="loading"
+                      :loading="snack.loading"
                       readonly
                       label="账号状态"
                       :value="state"
@@ -80,7 +81,7 @@
                   </v-col>
                   <v-col cols="6">
                     <v-text-field
-                      :loading="loading"
+                      :loading="snack.loading"
                       readonly
                       label="注册时间"
                       :value="userInfo.joinDate"
@@ -92,7 +93,7 @@
                 >
                   <v-col cols="6">
                     <v-text-field
-                      :loading="loading"
+                      :loading="snack.loading"
                       readonly
                       label="邮箱"
                       :value="userInfo.mail"
@@ -106,13 +107,7 @@
       </v-col>
       <v-spacer></v-spacer>
     </v-row>
-    <v-snackbar v-model="hasInfo" right bottom :timeout="3000">
-      {{ infoText }}
-      <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon @click="hasInfo = false">close</v-icon>
-      </v-btn>
-    </v-snackbar>
+    <Log :snack="snack"></Log>
   </v-container>
 </template>
 
@@ -121,30 +116,29 @@ import { Component, Vue, Watch } from "vue-property-decorator";
 import { Route } from "vue-router";
 import constValue from "@/constValue";
 import UserAvatar from "@/components/UserAvatar.vue";
-import {
-  UserInfo,
-  UserInfoResult,
-  DepartmentInfo,
-  MajorInfo,
-} from "@/struct";
+import Log from "@/components/Log.vue";
+import { UserInfo, UserInfoResult, DepartmentInfo, MajorInfo } from "@/struct";
 import gql from "graphql-tag";
+import { Snack } from '../snack';
 
 @Component({
   components: {
-    UserAvatar
+    UserAvatar,
+    Log
   }
 })
 export default class Profile extends Vue {
-  private loading: boolean = false;
+  private snack: Snack = new Snack();
   private userInfo: UserInfo = {
     userId: "",
     name: "",
     avatar: "",
     number: "",
-    department: { 
-      departId: "", 
+    department: {
+      departId: "",
       name: "",
-      majors: [] },
+      majors: []
+    },
     major: {
       majorId: "",
       name: ""
@@ -157,71 +151,21 @@ export default class Profile extends Vue {
     joinDate: ""
   };
 
-
-  private infoText: string = "";
-  private hasInfo: boolean = false;
-
   private get role() {
-    return constValue.userRole[this.userInfo.role]
+    return constValue.userRole[this.userInfo.role];
   }
 
   private get state() {
-    return constValue.userState[this.userInfo.state]
+    return constValue.userState[this.userInfo.state];
   }
 
-  async mounted() {
-    await this.load(this.$route.params.user_id);
+  mounted() {
+    this.getUserInfo((userInfo) => this.userInfo = userInfo, this.snack);
   }
 
-  @Watch("$route")
-  async beforeRouteUpdate(to: Route) {
-    await this.load(to.params.user_id);
-  }
-
-  async load(userId: string) {
-    try {
-      let res = await this.$apollo.query<UserInfoResult, { userId: string }>({
-        query: gql`
-          query($userId: String!) {
-            user(id: $userId) {
-              message
-              user {
-                userId
-                name
-                avatar
-                number
-                department {
-                  departId
-                  name
-                }
-                major {
-                  majorId
-                  name
-                }
-                mail
-                role
-                motto
-                state
-                gender
-                joinDate
-              }
-            }
-          }
-        `,
-        variables: {
-          userId: userId
-        },
-        fetchPolicy: "no-cache"
-      });
-      if (res.errors) throw res.errors.map(v => v.message).join(",");
-      if (res.data!.user.message) throw res.data!.user.message;
-      this.userInfo = res.data!.user.user;
-      this.loading = false;
-    } catch (e) {
-      this.loading = false;
-      this.infoText = e.toString();
-      this.hasInfo = true;
-    }
+  @Watch("$route")  
+  beforeRouteUpdate(to: Route) {
+    this.getUserInfo((userInfo) => this.userInfo = userInfo, this.snack, to.params.user_id);
   }
 }
 </script>

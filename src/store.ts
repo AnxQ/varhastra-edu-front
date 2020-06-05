@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import GlobalStateStore from "@/stores/GlobalState";
-
+import GroupStateStore from "@/stores/GroupStore"
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -9,6 +9,7 @@ export default new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
-    global: GlobalStateStore
+    global: GlobalStateStore,
+    group: GroupStateStore
   }
 });

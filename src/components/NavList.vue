@@ -1,6 +1,12 @@
 <template>
   <v-list dense>
-    <v-list-item @click="$router.push('/').catch(err => {err})">
+    <v-list-item
+      @click="
+        $router.push('/').catch(err => {
+          err;
+        })
+      "
+    >
       <v-list-item-action>
         <v-icon>home</v-icon>
       </v-list-item-action>
@@ -8,12 +14,29 @@
         <v-list-item-title>首页</v-list-item-title>
       </v-list-item-content>
     </v-list-item>
-    
+
     <v-list-item
       v-if="isLogin"
       @click="
         $router.push({
-          path: '/challenge',
+          path: '/courses',
+          query: { time: Date.now().toLocaleString() }
+        })
+      "
+    >
+      <v-list-item-action>
+        <v-icon>book</v-icon>
+      </v-list-item-action>
+      <v-list-item-content>
+        <v-list-item-title>课程</v-list-item-title>
+      </v-list-item-content>
+    </v-list-item>
+
+    <v-list-item
+      v-if="isLogin"
+      @click="
+        $router.push({
+          path: '/group',
           query: { time: Date.now().toLocaleString() }
         })
       "
@@ -22,7 +45,7 @@
         <v-icon>list_alt</v-icon>
       </v-list-item-action>
       <v-list-item-content>
-        <v-list-item-title>Challenges</v-list-item-title>
+        <v-list-item-title>群组</v-list-item-title>
       </v-list-item-content>
     </v-list-item>
     <v-divider></v-divider>
@@ -47,7 +70,14 @@
       </v-list-item-content>
     </v-list-item>
 
-    <v-list-item v-if="!isLogin" @click="$router.push(`/login`).catch(err => {err})">
+    <v-list-item
+      v-if="!isLogin"
+      @click="
+        $router.push(`/login`).catch(err => {
+          err;
+        })
+      "
+    >
       <v-list-item-action>
         <v-icon>person</v-icon>
       </v-list-item-action>
@@ -55,7 +85,7 @@
         <v-list-item-title>登录</v-list-item-title>
       </v-list-item-content>
     </v-list-item>
-    
+
     <div
       v-if="
         $store.state.global.role == 'admin' ||
@@ -77,10 +107,14 @@
         </v-list-item>
         <v-list-item
           @click="
-            $router.push({
-              path: '/admin/challenge',
-              query: { time: Date.now().toLocaleString() }
-            }).catch(err => {err})
+            $router
+              .push({
+                path: '/admin/challenge',
+                query: { time: Date.now().toLocaleString() }
+              })
+              .catch(err => {
+                err;
+              })
           "
         >
           <v-list-item-content>
@@ -98,7 +132,7 @@
       </v-list-group>
       <v-divider></v-divider>
     </div>
-    <v-list-item-group multiple v-model="settings">
+    <!-- <v-list-item-group multiple v-model="settings">
       <v-list-item value="dark">
         <template v-slot:default="{ active, toggle }">
           <v-list-item-action>
@@ -109,7 +143,7 @@
           </v-list-item-content>
         </template>
       </v-list-item>
-    </v-list-item-group>
+    </v-list-item-group> -->
   </v-list>
 </template>
 

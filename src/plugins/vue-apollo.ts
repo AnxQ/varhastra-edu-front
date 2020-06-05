@@ -1,18 +1,44 @@
 import Vue from "vue";
 import VueApollo from "vue-apollo";
-import { ApolloClient, InMemoryCache, NormalizedCacheObject, gql } from "apollo-boost";
-import { createHttpLink } from "apollo-link-http";
-import { LogoutResult } from '@/struct';
+import { split } from "apollo-link";
+import {
+  ApolloClient,
+  InMemoryCache,
+  NormalizedCacheObject,
+  gql
+} from "apollo-boost";
+import { createHttpLink, HttpLink } from "apollo-link-http";
+import { WebSocketLink } from "apollo-link-ws";
+import { getMainDefinition } from "apollo-utilities";
 
 Vue.use(VueApollo);
 
+export const server = "localhost:8000"
+
+const httpLink = createHttpLink({
+  uri: "http://" + server + "/graphql",
+  credentials: "include"
+});
+
+const wsLink = new WebSocketLink({
+  uri: "ws://" + server + "/subscriptions"
+});
+
+const link = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLink
+);
+
 const options = {
-  link: createHttpLink({
-    uri: "http://localhost:8000/graphql",
-    credentials: 'include'
-  }),
-  cache: new InMemoryCache(),
-  
+  link: link,
+  cache: new InMemoryCache()
 };
 
 const apolloClient = new ApolloClient(options);
@@ -114,28 +140,3 @@ export function createApolloProvider() {
 //     }
 // }
 
-// Manually call this when user log out
-// export async function onLogout(apolloClient: ApolloClient<NormalizedCacheObject>) {
-//   try {
-//     let res = await apolloClient.mutate<LogoutResult, {}>({
-//       mutation: gql`
-//         mutation {
-//           logout {
-//             message
-//           }
-//         }
-//       `
-//     });
-//     // $store
-//     // Vue.prototype.$store.commit("global/resetUserIdAndRole");
-//     // this.$store.commit("global/resetUserInfo");
-//     // sessionStorage.removeItem("user_id");
-//     // sessionStorage.removeItem("role");
-//     Vue.prototype.$router.push("/");
-//     // must logout success
-//     if (res.errors) throw res.errors.map(v => v.message).join(",");
-//     if (res.data!.logout.message) throw res.data!.logout.message;
-//   } catch (e) {
-//     console.log(e.toString());
-//   }
-// }

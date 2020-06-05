@@ -3,19 +3,65 @@ export interface Result {
 }
 
 export interface LoginInput {
-  input: {
-    info: string;
-    password: string;
-  };
+  info: string;
+  password: string;
+}
+
+export interface BaseInput<T> {
+  input: T;
+}
+
+export interface ChatMsgInput {
+  groupId: string;
+  type: string;
+  msg: string;
+}
+
+export interface ChatMsg {
+  msg: string;
+  type: string;
+  senderId: string;
+}
+
+export interface CourseInfo {
+  courseId: string
+  liveId: string
+  timeOpen: string
+  timeClose: string
+  state: number
+  cover: string
+  title: string
+  description: string
+  organize: string
+  coursewares: [CoursewareInfo]
+  comments: [CommentInfo]
+  teachers: [UserInfo]
+  assistants: [UserInfo]
+  teach: boolean
+}
+
+export interface CommentInfo {
+  commentId: string
+  user: UserInfo
+  details: string
+  timeCreate: string
+  timeModified: string
+  replyTo: string
+}
+
+export interface CoursewareInfo {
+  coursewareId: string
+  name: string
+  type: number
+  timeCreate: string
+  timeModified: string
 }
 
 export interface RegisterInput {
-  input: {
-    name: string;
-    password: string;
-    majorId: string;
-    mail: string;
-  };
+  name: string;
+  password: string;
+  majorId: string;
+  mail: string;
 }
 
 export interface MajorInfo {
@@ -44,21 +90,38 @@ export interface UserInfo {
   joinDate: string;
 }
 
+export interface GroupInfo {
+  groupId: string;
+  name: string;
+  users: UserInfo[];
+}
+
 export interface AuthInfo {
   userId: string;
   role: number;
 }
 
-export type UserInfoResult = { user: { user: UserInfo } & Result };
-export type ManyUserInfoResult = { users: { users: UserInfo[] } & Result };
+export interface GroupChatMsg {
+  groupId: string
+  msgs: ChatMsg[]
+}
 
-export type DepartmentInfoResult = {
-  department: { department: DepartmentInfo } & Result;
-};
-export type ManyDepartmentInfoResult = {
-  departments: { departments: DepartmentInfo[] } & Result;
-};
+// Query Results
+export type UserInfoResult = { user: UserInfo };
+export type ManyUserInfoResult = { users: UserInfo[] };
 
-export type LoginResult = { login: AuthInfo & Result };
-export type RegisterResult = { register: AuthInfo & Result };
+export type DepartmentInfoResult = { department: DepartmentInfo };
+export type ManyDepartmentInfoResult = { departments: DepartmentInfo[] };
+
+export type GroupChatMsgResult = { chat: GroupChatMsg };
+export type ManyGroupInfoResult = { groups: GroupInfo[] };
+
+export type CourseInfoResult = { course: CourseInfo };
+export type ManyCourseInfoResult = { courses: CourseInfo[] };
+
+
+// Mutation Results
+export type LoginResult = { login: AuthInfo };
+export type RegisterResult = { register: AuthInfo };
 export type LogoutResult = { logout: Result };
+export type SendMsgResult = { sendMsg: Result };

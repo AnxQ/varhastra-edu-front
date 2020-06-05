@@ -1,14 +1,20 @@
 <template>
   <v-app id="app">
-    <v-navigation-drawer v-model="drawer" app clipped>
+    <v-navigation-drawer app clipped permanent :mini-variant="drawer" :expand-on-hover="drawer">
       <nav-list :isLogin="!!$store.state.global.userId"></nav-list>
     </v-navigation-drawer>
 
-    <v-app-bar app clipped-left class="higher pr-2">
+    <v-app-bar app clipped-left clipped-right class="higher pr-2">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Varhastra Edu</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-menu offset-y v-if="!!$store.state.global.userInfo" nudge-bottom="19" transition="slide-y-transition">
+      <v-menu
+        offset-y
+        v-if="!!$store.state.global.userInfo"
+        nudge-bottom="19"
+        transition="slide-y-transition"
+        :close-on-content-click="false"
+      >
         <template v-slot:activator="{ on }">
           <v-avatar
             class="hoverable"
@@ -29,16 +35,19 @@
           <v-list>
             <v-list-item>
               <v-list-item-content>
-                <v-list-item-title>{{$store.state.global.userInfo.name}}</v-list-item-title>
-                <v-list-item-subtitle class="grey--text">学工号: {{$store.state.global.userInfo.number}}</v-list-item-subtitle>
+                <v-list-item-title>{{
+                  $store.state.global.userInfo.name
+                }}</v-list-item-title>
+                <v-list-item-subtitle class="grey--text"
+                  >学工号:
+                  {{
+                    $store.state.global.userInfo.number
+                  }}</v-list-item-subtitle
+                >
               </v-list-item-content>
 
               <v-list-item-action>
-                <v-btn
-                  :class="fav ? 'red--text' : ''"
-                  icon
-                  @click="fav = !fav"
-                >
+                <v-btn :class="fav ? 'red--text' : ''" icon @click="fav = !fav">
                   <v-icon>mdi-heart</v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -52,20 +61,13 @@
               <v-list-item-action>
                 <v-switch color="purple"></v-switch>
               </v-list-item-action>
-              <v-list-item-title>Enable messages</v-list-item-title>
-            </v-list-item>
-
-            <v-list-item>
-              <v-list-item-action>
-                <v-switch color="purple"></v-switch>
-              </v-list-item-action>
-              <v-list-item-title>Enable hints</v-list-item-title>
+              <v-list-item-title>群组消息通知</v-list-item-title>
             </v-list-item>
           </v-list>
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="">注销</v-btn>
+            <v-btn color="primary" text @click="logout">注销</v-btn>
           </v-card-actions>
         </v-card>
       </v-menu>
@@ -97,7 +99,8 @@ import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import gql from "graphql-tag";
 import NavList from "@/components/NavList.vue";
 import UserAvatar from "@/components/UserAvatar.vue";
-import { LogoutResult } from "@/struct"
+import { gqlQuery } from "@/fetch"
+import { LogoutResult, UserInfoResult } from "@/struct";
 
 @Component({
   components: {
@@ -108,20 +111,23 @@ import { LogoutResult } from "@/struct"
 export default class App extends Vue {
   private drawer: boolean | null = null;
   private permissioned: boolean = false;
-  private fav:boolean = false;
+  private fav: boolean = false;
 
   private infoTitle: string = "";
   private infoText: string = "";
   private hasInfo: boolean = false;
 
-  async mounted() {
+  mounted() {
     let userId = sessionStorage.getItem("user_id") || null;
     let role = sessionStorage.getItem("role") || null;
     if (!userId || !role) {
       userId = null;
       role = null;
     }
+    gqlQuery.user
     this.$store.commit("global/setUserIdAndRole", { userId, role });
+    if (userId && role)
+      this.getUserInfo()
   }
 
   async logout() {
@@ -167,4 +173,3 @@ html {
   top: 75px;
 }
 </style>
-
