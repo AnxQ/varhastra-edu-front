@@ -23,6 +23,11 @@ export interface ChatMsg {
   senderId: string;
 }
 
+export interface TagInfo {
+  tagId: string
+  name: string
+}
+
 export interface CourseInfo {
   courseId: string
   liveId: string
@@ -37,7 +42,12 @@ export interface CourseInfo {
   comments: [CommentInfo]
   teachers: [UserInfo]
   assistants: [UserInfo]
+  tags: [TagInfo]
   teach: boolean
+  joined: boolean
+  userCount: number
+  sentiGood: number
+  sentiAvg: number
 }
 
 export interface CommentInfo {
@@ -62,6 +72,13 @@ export interface RegisterInput {
   password: string;
   majorId: string;
   mail: string;
+}
+
+export interface CommentInput {
+  commentId?: String
+  details?: String
+  courseId?: String
+  replyTo?: String
 }
 
 export interface MajorInfo {

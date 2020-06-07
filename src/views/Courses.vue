@@ -28,7 +28,8 @@
                     </v-card-text>
 
                     <v-card-actions>
-                    <v-btn color="orange" text> 进入课程 </v-btn>
+                    <v-btn color="orange" text @click="$router.push({ name: 'course', params: { course_id: course.courseId }})"
+                    > 进入课程 </v-btn>
                     <v-btn color="orange" text> 操作 </v-btn>
                     <v-chip
                             class="ma-2 float-right"
@@ -62,7 +63,7 @@
                         </v-card-text>
 
                         <v-card-actions>
-                        <v-btn color="orange" text> 进入课程 </v-btn>
+                        <v-btn color="orange" text @click="$router.push({ name: 'course', params: { course_id: course.courseId }})"> 进入课程 </v-btn>
                         <v-btn color="orange" text> 操作 </v-btn>
                         <v-chip
                                 class="ma-2 float-right"

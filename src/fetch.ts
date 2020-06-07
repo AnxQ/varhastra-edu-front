@@ -54,6 +54,14 @@ const gqlMutation = {
         message
       }
     }
+  `,
+
+  comment: gql`
+    mutation($input: CommentInput!) {
+      commentChange(input: $input) {
+        message
+      }
+    }
   `
 };
 
@@ -136,6 +144,7 @@ const gqlQuery = {
   course: gql`
     query($courseId: String!) {
       course(id: $courseId) {
+        courseId
         liveId
         timeOpen
         timeClose
@@ -161,7 +170,12 @@ const gqlQuery = {
           name
           avatar
         }
+        tags {
+          tagId
+          name
+        }
         teach
+        joined
         comments {
           commentId
           user {
@@ -174,6 +188,9 @@ const gqlQuery = {
           timeModified
           replyTo
         }
+        userCount
+        sentiGood
+        sentiAvg
       }
     }
   `,
@@ -193,7 +210,7 @@ const gqlQuery = {
     }
   `
 
-  
+
 };
 
 
