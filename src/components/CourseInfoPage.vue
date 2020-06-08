@@ -32,20 +32,21 @@
                         </div>
                     </v-row>
                     <v-row class="d-flex ma-2"><span class="align-self-center"><strong>课程标签：</strong></span>
+                        <v-chip v-if="course.tags.length <= 1" pill small text-color="white" class="ma-2">暂无</v-chip>
                         <v-chip 
-                        v-for="(tag, i) in tags" 
+                        v-for="(tag, i) in course.tags" 
                         :key="i" 
                         text-color="white" 
                         :color="colorsCycle[i % colorsCycle.length]"
                         pill small
-                        class="ma-2">{{ tag }}</v-chip>
+                        class="ma-2">{{ tag.name }}</v-chip>
                     </v-row>
                     <v-row class="ma-2"><span><strong>课程开放时间：</strong>&nbsp;{{ course.timeOpen }} ~ {{ course.timeClose }}</span></v-row>
                     <v-row class="ma-2"><span><strong>课程描述：</strong>&nbsp;{{ course.description }}</span></v-row>
                 </v-col>
             </v-row>
             <comments v-if="course" 
-            :comments="course.comments" 
+            :comments_="course.comments" 
             :admin="admin"
             :courseId="course.courseId"
             :courseName="course.name"></comments>

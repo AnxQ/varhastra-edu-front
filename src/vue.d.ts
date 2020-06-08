@@ -15,6 +15,7 @@ declare module "vue/types/vue" {
       data?: T,
       call_after?: (res: R) => void,
       snack?: Snack,
+      disableCache?: boolean
     ): Promise<ApolloQueryResult<R>> | void,
     apolloMutate<R = any, T = OperationVariables>(
       mutation: DocumentNode,

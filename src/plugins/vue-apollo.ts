@@ -13,7 +13,7 @@ import { getMainDefinition } from "apollo-utilities";
 
 Vue.use(VueApollo);
 
-export const server = "localhost:8000"
+export const server = "localhost:8001"
 
 const httpLink = createHttpLink({
   uri: "http://" + server + "/graphql",

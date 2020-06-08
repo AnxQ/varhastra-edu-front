@@ -65,6 +65,7 @@ export interface CoursewareInfo {
   type: number
   timeCreate: string
   timeModified: string
+  thumbsnail: string
 }
 
 export interface RegisterInput {
@@ -135,6 +136,8 @@ export type ManyGroupInfoResult = { groups: GroupInfo[] };
 
 export type CourseInfoResult = { course: CourseInfo };
 export type ManyCourseInfoResult = { courses: CourseInfo[] };
+
+export type ManyCommentInfoResult = { comments: CommentInfo[] };
 
 
 // Mutation Results

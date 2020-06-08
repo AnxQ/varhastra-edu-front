@@ -6,10 +6,15 @@
             <v-tab :href="`#tab-info`">
                 <span><v-icon left>eco</v-icon>课程简介</span>
             </v-tab>
+            <v-tab :href="`#tab-chapter`">
+                <span><v-icon left>source</v-icon>章节列表</span>
+            </v-tab>
 
             <v-tab-item value="tab-info">
                 <course-info-page v-if="course" :course="course"></course-info-page>
-
+            </v-tab-item>
+            <v-tab-item value="tab-chapter">
+                <chapter-info-page v-if="course" :course="course"></chapter-info-page>
             </v-tab-item>
         </v-tabs>
     </div>
@@ -21,12 +26,14 @@ import { Route } from "vue-router";
 import { gqlQuery } from "@/fetch";
 import Log from "@/components/Log.vue";
 import CourseInfoPage from "@/components/CourseInfoPage.vue"
+import ChapterInfoPage from "@/components/ChapterInfoPage.vue"
 
 import { Snack } from "@/snack";
 
 @Component({
   components: {
     CourseInfoPage,
+    ChapterInfoPage,
     Log
   }
 })

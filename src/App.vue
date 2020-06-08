@@ -101,11 +101,13 @@ import NavList from "@/components/NavList.vue";
 import UserAvatar from "@/components/UserAvatar.vue";
 import { gqlQuery } from "@/fetch"
 import { LogoutResult, UserInfoResult } from "@/struct";
+import { Snack } from "@/snack";
+
 
 @Component({
   components: {
     NavList,
-    UserAvatar
+    UserAvatar,
   }
 })
 export default class App extends Vue {
@@ -116,6 +118,7 @@ export default class App extends Vue {
   private infoTitle: string = "";
   private infoText: string = "";
   private hasInfo: boolean = false;
+  private snack: Snack = new Snack();
 
   mounted() {
     let userId = sessionStorage.getItem("user_id") || null;
@@ -124,10 +127,9 @@ export default class App extends Vue {
       userId = null;
       role = null;
     }
-    gqlQuery.user
+    gqlQuery.user;
     this.$store.commit("global/setUserIdAndRole", { userId, role });
-    if (userId && role)
-      this.getUserInfo()
+    this.getUserInfo((user) => console.log("Should updated."), this.snack, userId!)
   }
 
   async logout() {

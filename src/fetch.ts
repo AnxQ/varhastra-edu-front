@@ -208,9 +208,24 @@ const gqlQuery = {
         teach
       }
     }
+  `,
+
+  comments: gql`
+    query($courseId: String!) {
+      comments(courseId: $courseId) {
+        commentId
+        user {
+          userId
+          name
+          avatar
+        }
+        details
+        timeCreate
+        timeModified
+        replyTo
+      }
+    }
   `
-
-
 };
 
 
@@ -218,7 +233,8 @@ Vue.prototype.apolloQuery = function<R = any, T = OperationVariables>(
   query: DocumentNode,
   data?: T,
   call_after?: (res: R) => void,
-  snack?: Snack
+  snack?: Snack,
+  disableCache: boolean = false 
 ) {
   let vue: Vue = this;
   if(call_after && snack) {
@@ -226,7 +242,8 @@ Vue.prototype.apolloQuery = function<R = any, T = OperationVariables>(
     vue.$apollo
       .query<R, T>({
         query: query,
-        variables: data!
+        variables: data!,
+        fetchPolicy: disableCache ? 'no-cache' : 'cache-first'
       })
       .then((res) => call_after(res.data))
       .catch((err) => snack.showInfo(err))
@@ -243,7 +260,7 @@ Vue.prototype.apolloQuery = function<R = any, T = OperationVariables>(
 Vue.prototype.apolloMutate = function<R = any, T = OperationVariables>(
   mutation: DocumentNode,
   data?: T,
-  call_after?: (res: R) => void,
+  call_after?: (res: R | null | undefined) => void,
   snack?: Snack
 ) {
   let vue: Vue = this;
@@ -253,7 +270,9 @@ Vue.prototype.apolloMutate = function<R = any, T = OperationVariables>(
         mutation: mutation,
         variables: { input: data! }
       })
-      .then((res) => call_after(res.data!))
+      .then((res) => { 
+        call_after(res.data)
+      })
       .catch((err) => snack.showInfo(err))
       .finally(() => snack.loading = false)
   }
@@ -285,4 +304,12 @@ function img(fileName: string) {
   return "http://" + server + "/img/" + fileName;
 }
 
-export { gqlQuery, gqlMutation, gqlSubscription, img};
+function video(fileName: string) {
+  return "http://" + server + "/video/" + fileName;
+}
+
+function doc(fileName: string) {
+  return "http://" + server + "/doc/" + fileName;
+}
+
+export { gqlQuery, gqlMutation, gqlSubscription, img, video, doc};

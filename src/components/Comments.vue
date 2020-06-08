@@ -6,12 +6,12 @@
                 <v-btn outlined rounded small color="grey">打分</v-btn>
             </v-card-title>
             <v-divider></v-divider>
-            <v-card-text v-if="comments.length <= 0" class="d-flex align-center justify-center">
+            <v-card-text v-if="comments.length <= 0 || !comments.some(comment => comment.details != `[deleted]`)" class="d-flex align-center justify-center">
                 糟了...<v-img :src="img(`not_find.png`)" contain max-width="100"/>...这里什么都没有... 
             </v-card-text>
             <v-list three-line>
                 <template v-for="(comment, i) in comments">
-                <v-list-item :key="comment.commentId" >
+                <v-list-item v-if="comment.details != `[deleted]`" :key="comment.commentId" >
                     <v-list-item-avatar>
                         <v-avatar
                             class="hoverable"
@@ -53,7 +53,7 @@
                 </v-list-item>
                 <v-divider
                     inset
-                    v-if="i + 1 < comments.length"
+                    v-if="i + 1 < comments.length && comment.details != `[deleted]` && comments[i + 1].details != `[deleted]`"
                     :key="`div`+i"
                 ></v-divider>
                 </template>
@@ -95,7 +95,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator"
 import UserAvatar from "@/components/UserAvatar.vue"
 import Log from "@/components/Log.vue"
-import { CommentInfo, CourseInfo, Result, CommentInput } from "@/struct"
+import { CommentInfo, CourseInfo, Result, CommentInput, ManyCommentInfoResult } from "@/struct"
 import { img, gqlMutation, gqlQuery } from "@/fetch"
 import { simplifyDate } from "@/utils"
 import { Snack } from "@/snack"
@@ -107,10 +107,11 @@ import { Snack } from "@/snack"
     }
 })
 export default class Comments extends Vue{
-    @Prop() private comments!: CommentInfo[];
+    @Prop() private comments_!: CommentInfo[];
     @Prop() private admin?: boolean;
     @Prop() private courseName!: string;
     @Prop() private courseId!: string
+    private comments: CommentInfo[] = this.comments_;
     private currentUserId: string = this.$store.state.global.userId;
     private img = img;
     private simplifyDate = simplifyDate;
@@ -129,6 +130,8 @@ export default class Comments extends Vue{
 
     commentDesc(commentId: string) {
         let comment = this.comments.find(comment => comment.commentId == commentId);
+        if (comment!.details == "[deleted]")
+            return `@${comment!.user.name}: [评论已删除]`
         return '@'+ comment!.user.name + ': ' + comment!.details.substr(0, 10) + '...'
     }
 
@@ -167,10 +170,20 @@ export default class Comments extends Vue{
             (data) => { 
                 this.form.loading = false; 
                 this.commentDialog = false; 
-                this.$router.go(0);
+                this.updateComment();
             },
             this.snack
             )
+    }
+
+    updateComment() {
+        this.apolloQuery<ManyCommentInfoResult, { courseId: string }>(
+            gqlQuery.comments,
+            { courseId: this.courseId },
+            (data) => this.comments = data.comments,
+            this.snack,
+            true
+        )
     }
 }
 </script>
