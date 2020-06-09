@@ -9,6 +9,10 @@ import "@/main.scss";
 
 Vue.config.productionTip = false;
 Vue.prototype.snack = snack;
+Vue.filter('f2', function(val: Number | string) {
+  let v = Number(val)
+  return v ? v.toFixed(2) : val;
+})
 new Vue({
   vuetify,
   router,

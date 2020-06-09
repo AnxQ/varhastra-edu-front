@@ -9,12 +9,18 @@
             <v-tab :href="`#tab-chapter`">
                 <span><v-icon left>source</v-icon>章节列表</span>
             </v-tab>
+            <v-tab v-if="admin" :href="`#tab-admin`" >
+                <span><v-icon left>settings</v-icon>管理</span>
+            </v-tab>
 
             <v-tab-item value="tab-info">
-                <course-info-page v-if="course" :course="course"></course-info-page>
+                <course-info-page v-if="course" :course="course" :admin="admin"></course-info-page>
             </v-tab-item>
             <v-tab-item value="tab-chapter">
                 <chapter-info-page v-if="course" :course="course"></chapter-info-page>
+            </v-tab-item>
+            <v-tab-item v-if="admin" value="tab-admin">
+                <course-admin-page v-if="course" :course="course"></course-admin-page>
             </v-tab-item>
         </v-tabs>
     </div>
@@ -27,12 +33,14 @@ import { gqlQuery } from "@/fetch";
 import Log from "@/components/Log.vue";
 import CourseInfoPage from "@/components/CourseInfoPage.vue"
 import ChapterInfoPage from "@/components/ChapterInfoPage.vue"
+import CourseAdminPage from "@/components/CourseAdminPage.vue"
 
 import { Snack } from "@/snack";
 
 @Component({
   components: {
     CourseInfoPage,
+    CourseAdminPage,
     ChapterInfoPage,
     Log
   }
@@ -42,6 +50,7 @@ export default class Course extends Vue {
     private tab = null;
     private course: CourseInfo | null = null;
     private snack: Snack = new Snack();
+    private admin: boolean = false;
     mounted() {
         this.queryCourseInfo(this.$route.params.course_id);
     }
@@ -55,6 +64,9 @@ export default class Course extends Vue {
             { courseId: courseId },
             (data) => {
                 this.course = data.course;
+                this.admin = this.course.assistants
+                    .concat(this.course.teachers)
+                    .some(user => user.userId == this.$store.state.global.userId)
             }, 
             this.snack)
     }

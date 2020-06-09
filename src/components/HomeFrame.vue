@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="fill-height">
-    <iframe ref="iframe" width="100%" height="100%" src="/home.html"></iframe>
+    <iframe ref="iframe" width="100%" height="100%" src="/about.html"></iframe>
   </v-container>
 </template>
 

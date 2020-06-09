@@ -3,7 +3,7 @@
         <v-card outlined class="mx-auto" max-width="800px">
             <v-card-title>评论<v-spacer/>
                 <v-btn outlined rounded small color="grey" class="margin-right" @click="addComment({})">评论</v-btn>
-                <v-btn outlined rounded small color="grey">打分</v-btn>
+                <v-btn outlined rounded small color="grey" @click="scoreDialog = true">打分</v-btn>
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text v-if="comments.length <= 0 || !comments.some(comment => comment.details != `[deleted]`)" class="d-flex align-center justify-center">
@@ -86,6 +86,22 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
+            <v-dialog v-model="scoreDialog" persistent max-width="600px">
+                <v-card>
+                    <v-card-text class="text-center">
+                    <v-rating 
+                    v-model="rating"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    medium>
+                    </v-rating>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn text @click="scoreDialog = false">取消</v-btn>
+                        <v-btn text @click="scoreSubmit" :loading="form.loading">确认</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
         </v-card>
         <Log :snack="snack"/>
     </v-container>
@@ -95,10 +111,11 @@
 import { Vue, Component, Prop } from "vue-property-decorator"
 import UserAvatar from "@/components/UserAvatar.vue"
 import Log from "@/components/Log.vue"
-import { CommentInfo, CourseInfo, Result, CommentInput, ManyCommentInfoResult } from "@/struct"
+import { CommentInfo, CourseInfo, Result, CommentInput, ManyCommentInfoResult, ScoreInput } from "@/struct"
 import { img, gqlMutation, gqlQuery } from "@/fetch"
 import { simplifyDate } from "@/utils"
 import { Snack } from "@/snack"
+
 
 @Component({
     components:{
@@ -106,7 +123,7 @@ import { Snack } from "@/snack"
         Log
     }
 })
-export default class Comments extends Vue{
+export default class Comments extends Vue {
     @Prop() private comments_!: CommentInfo[];
     @Prop() private admin?: boolean;
     @Prop() private courseName!: string;
@@ -116,6 +133,8 @@ export default class Comments extends Vue{
     private img = img;
     private simplifyDate = simplifyDate;
     private commentDialog = false;
+    private scoreDialog = false;
+    private rating: Number = 0;
     private rules = [(v: string) => v.length <= 100 || '最多键入100字符'];
     private form = {
         replyTo: { name: "", commentId: "" },
@@ -173,7 +192,23 @@ export default class Comments extends Vue{
                 this.updateComment();
             },
             this.snack
-            )
+        )
+    }
+
+    scoreSubmit() {
+        this.form.loading = true;
+        this.apolloMutate<Result, ScoreInput>(
+            gqlMutation.score, 
+            {
+                courseId: this.courseId,
+                score: this.rating
+            },
+            (data) => { 
+                this.form.loading = false;
+                this.scoreDialog = false;
+            },
+            this.snack
+        )
     }
 
     updateComment() {

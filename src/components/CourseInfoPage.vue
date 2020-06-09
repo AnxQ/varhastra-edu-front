@@ -26,8 +26,8 @@
                         <v-divider inset vertical class="course-data-divider"></v-divider>
                         <div class="d-flex align-center flex-column pa-0" style="width: 132px">
                             <v-row><span><v-icon left>star</v-icon><strong>评分</strong></span></v-row>
-                            <v-row>
-                                {{ course.sentiAvg > 0 ? course.sentiAvg : `暂无` }}
+                            <v-row> 
+                                {{ course.sentiAvg > 0 ? course.sentiAvg : `暂无`  | f2 }}
                             </v-row>
                         </div>
                     </v-row>
@@ -49,7 +49,7 @@
             :comments_="course.comments" 
             :admin="admin"
             :courseId="course.courseId"
-            :courseName="course.name"></comments>
+            :courseName="course.title"></comments>
         </v-col>
         <v-col :cols="3">
             <v-list rounded dense>
@@ -111,17 +111,15 @@ import { img } from "@/fetch";
 })
 export default class CourseInfoPage extends Vue {
     @Prop() private course!: CourseInfo;
+    @Prop() private admin!: boolean; 
     private img = img;
     private courseState = constValue.courseState;
-    private tags = ["基础课程","机器学习","数学","大数据"]
     private colorsCycle = ["red", "pink", "purple", "deep-purple", "blue", "cyan", "teal", "light-green", "yellow", "orange", "brown"]
     private userGroups = [
         {name: "教师", members: this.course.teachers },
         {name: "助理", members: this.course.assistants },
     ]
-    private admin = false; 
     mounted() {
-        this.admin = !this.course.assistants.find(user => user.userId == this.$store.state.global.userId) || this.course.teach;
 
     }
 }

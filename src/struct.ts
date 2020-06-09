@@ -42,6 +42,7 @@ export interface CourseInfo {
   comments: [CommentInfo]
   teachers: [UserInfo]
   assistants: [UserInfo]
+  students: [UserInfo]
   tags: [TagInfo]
   teach: boolean
   joined: boolean
@@ -66,6 +67,12 @@ export interface CoursewareInfo {
   timeCreate: string
   timeModified: string
   thumbsnail: string
+}
+
+export interface CourseChangeInput {
+  type: string
+  userIds: string[]
+  courseId: string
 }
 
 export interface RegisterInput {
@@ -106,6 +113,7 @@ export interface UserInfo {
   state: number;
   gender: string;
   joinDate: string;
+  disable?: boolean;
 }
 
 export interface GroupInfo {
@@ -122,6 +130,11 @@ export interface AuthInfo {
 export interface GroupChatMsg {
   groupId: string
   msgs: ChatMsg[]
+}
+
+export interface ScoreInput {
+  courseId: String
+  score: Number
 }
 
 // Query Results
@@ -145,3 +158,4 @@ export type LoginResult = { login: AuthInfo };
 export type RegisterResult = { register: AuthInfo };
 export type LogoutResult = { logout: Result };
 export type SendMsgResult = { sendMsg: Result };
+export type ScoreResult = { score: Result };

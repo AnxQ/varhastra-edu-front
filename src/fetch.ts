@@ -62,6 +62,22 @@ const gqlMutation = {
         message
       }
     }
+  `,
+
+  score: gql`
+    mutation($input: ScoreInput!) {
+      score(input: $input) {
+        message
+      }
+    }
+  `,
+
+  courseChange: gql`
+    mutation($input: CourseChangeInput!) {
+      courseChange(input: $input) {
+        message
+      }
+    }
   `
 };
 
@@ -100,6 +116,24 @@ const gqlQuery = {
         state
         gender
         joinDate
+      }
+    }
+  `,
+
+  usersByCourse: gql`
+    query($courseId: String!) {
+      users(courseId: $courseId) {
+        name
+        avatar
+        userId
+        department {
+          name
+        }
+        major {
+          name
+        }
+        role
+        number
       }
     }
   `,
@@ -170,6 +204,11 @@ const gqlQuery = {
           name
           avatar
         }
+        students {
+          userId
+          name
+          avatar
+        }
         tags {
           tagId
           name
@@ -225,6 +264,38 @@ const gqlQuery = {
         replyTo
       }
     }
+  `,
+
+  courseData: gql`
+  query($courseId: String!) {
+    course(id: $courseId) {
+      userCount
+      sentiGood
+      sentiAvg
+    }
+  }
+  `,
+
+  courseUser: gql`
+  query($courseId: String!) {
+    course(id: $courseId) {
+      teachers {
+        userId
+        name
+        avatar
+      }
+      assistants {
+        userId
+        name
+        avatar
+      }
+      students {
+        userId
+        name
+        avatar
+      }
+    }
+  }
   `
 };
 
